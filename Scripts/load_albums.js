@@ -8,7 +8,35 @@ function load_album_list(callback){
            return; 
        } 
        
-       callback(null, files); 
+       // List only folders - skip other files in the same directory as albums 
+       var only_dirs = []; 
+       
+       // Instead of regular loop, special form of iteration has to be used
+       // Anonymous function - self-invoking 
+       (function iterator(index){
+           if(index == files.length){ // NOTE: length is lowercase
+               callback(null, only_dirs);
+               return; 
+           }
+           
+           // Check if file or directory
+           fs.stat("albums/" + files[index], 
+            function(err, stats){
+                if(err){
+                    callback(err); 
+                    return; 
+                }
+                
+                if(stats.isDirectory()){
+                    only_dirs.push(files[index]);
+                }
+               
+               iterator(index + 1);
+           });
+       })(0); 
+       
+       // This is not valid after applying iterator
+       //callback(null, files); 
     });
 }    
     
