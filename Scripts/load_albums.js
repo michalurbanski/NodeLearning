@@ -25,12 +25,14 @@ function load_album_list(callback){
            fs.stat("albums/" + files[index], 
             function(err, stats){
                 if(err){
-                    callback(err); 
+                    //callback(err);
+                    callback(make_error("file_error", JSON.stringify(err))); 
                     return; 
                 }
                 
                 if(stats.isDirectory()){
-                    only_dirs.push(files[index]);
+                    var obj = {name: files[index]};
+                    only_dirs.push(obj);
                 }
                
                iterator(index + 1);
@@ -44,25 +46,77 @@ function load_album_list(callback){
     
 function handle_incoming_request(req, res){
     console.log("INCOMING REQUEST: " + req.method + " " + req.url);
+    
+    // handle multiple requests
+    if(req.url == '/albums.json'){
+        // list all albums
+        handle_list_albums(req, res);
+    }
+    else if (req.url.substr(0, 7) == '/albums' && req.url.substr(req.url.length - 5) == '.json'){
+        // list all items in single album 
+        handle_get_album(req, res);   
+    }
+    else{
+        send_failure(res, 404, invalid_resource());    
+    }
+    
+    // load_album_list(function(err, albums){
+    //     if(err){
+    //         res.writeHead(503, {"Content-Type": "application/json"});
+    //         res.end(JSON.stringify(err) + "\n");
+    //         return; 
+    //     }
+       
+    //     // proceed with albums
+    //     var result = {
+    //         error: null, 
+    //         data : {
+    //             albums: albums
+    //         }    
+    //     };
+        
+    //     res.writeHead(200, {"Content-Type": "application/json"});
+    //     res.end(JSON.stringify(result) + "\n");
+    // });
+}
+
+function handle_list_albums(req, res){
     load_album_list(function(err, albums){
         if(err){
-            res.writeHead(503, {"Content-Type": "application/json"});
-            res.end(JSON.stringify(err) + "\n");
+            send_failure(res, 503, err);
             return; 
         }
-       
-        // proceed with albums
-        var result = {
-            error: null, 
-            data : {
-                albums: albums
-            }    
-        };
         
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result) + "\n");
-    });
+        send_success(res, {albums: albums});
+    }); 
 }
   
- var s = http.createServer(handle_incoming_request);
- s.listen(8080);
+function handle_get_album(req, res){
+    
+}
+
+function make_error(err, msg){
+    var e = new Error(msg);
+    e.code = err; 
+    
+    return e;     
+}
+
+function invalid_resource(){
+    return make_error("invalid_resource", "the requested resource does not exist");
+}
+
+function send_failure(res, code, err){
+    //var code = (err.code) ? err.code : err.name; 
+    res.writeHead(code, {"Content-Type": "application/json"}); 
+    res.end(JSON.stringify({error: code, message: err.message}) + "\n");
+}
+
+function send_success(res, data){
+    res.writeHead(200, {"Content-Type": "application/json"}); 
+    var output = {error: null, data: data}; 
+    res.end(JSON.stringify(output) + "\n");
+}
+
+var s = http.createServer(handle_incoming_request);
+s.listen(8080);
