@@ -8,7 +8,9 @@ function load_album_list(callback){
            return; 
        } 
        
-       // List only folders - skip other files in the same directory as albums 
+       // List only folders - skip other files in the same directory as albums
+       // We expect only folders, if file is found between folders than it should be skipped. 
+       // In current implementation someNotNeededFileInFolder.txt should be skipped in this way.  
        var only_dirs = []; 
        
        // Instead of regular loop, special form of iteration has to be used
