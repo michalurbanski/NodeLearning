@@ -55,6 +55,9 @@ function load_album(album_name, callback){
             else{
                 callback(make_error("file_error", JSON.stringify(err)));
             }
+
+            // Even after callback return must be call to prevent further code processing             
+            return; 
         }  
        
        var only_files = []; 
