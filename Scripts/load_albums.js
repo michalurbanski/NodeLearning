@@ -59,25 +59,6 @@ function handle_incoming_request(req, res){
     else{
         send_failure(res, 404, invalid_resource());    
     }
-    
-    // load_album_list(function(err, albums){
-    //     if(err){
-    //         res.writeHead(503, {"Content-Type": "application/json"});
-    //         res.end(JSON.stringify(err) + "\n");
-    //         return; 
-    //     }
-       
-    //     // proceed with albums
-    //     var result = {
-    //         error: null, 
-    //         data : {
-    //             albums: albums
-    //         }    
-    //     };
-        
-    //     res.writeHead(200, {"Content-Type": "application/json"});
-    //     res.end(JSON.stringify(result) + "\n");
-    // });
 }
 
 function handle_list_albums(req, res){
