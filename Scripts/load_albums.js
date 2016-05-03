@@ -153,7 +153,7 @@ function invalid_resource(){
 function send_failure(res, code, err){
     //var code = (err.code) ? err.code : err.name; 
     res.writeHead(code, {"Content-Type": "application/json"}); 
-    res.end(JSON.stringify({error: code, message: err.message}) + "\n");
+    res.end(JSON.stringify({error: code, error_code: err.code, message: err.message}) + "\n");
 }
 
 function send_success(res, data){
