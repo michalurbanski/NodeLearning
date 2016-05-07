@@ -14,7 +14,7 @@ function load_album_list(callback){
        // In current implementation someNotNeededFileInFolder.txt should be skipped in this way.  
        var only_dirs = []; 
        
-       // Instead of regular loop, special form of iteration has to be used
+       // Instead of regular loop, special form of iteration has to be used in node.js
        // Anonymous function - self-invoking 
        (function iterator(index){
            if(index == files.length){ // NOTE: length is lowercase
@@ -158,7 +158,8 @@ function send_failure(res, code, err){
 
 function send_success(res, data){
     res.writeHead(200, {"Content-Type": "application/json"}); 
-    var output = {error: null, data: data}; 
+    var output = {error: null, data: data};
+    // Output has to be stringified, otherwise content of internal array is not printed correctly 
     res.end(JSON.stringify(output) + "\n");
 }
 
